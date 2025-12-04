@@ -7,53 +7,100 @@
     <title>{% block title %}ReciclArte | {{ site_profile.name|default:"Artista" }}{% endblock %}</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{% static 'mycss/main.css' %}">
     
     <style>
-        @font-face {
+       @font-face {
             font-family: 'ShantellSans';
             src: url("{% static 'fonts/ShantellSans-Italic-VariableFont_BNCE,INFM,SPAC,wght.ttf' %}");
         }
-        body { font-family: 'ShantellSans', sans-serif; }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    <!-- NAVBAR -->
-    <header class="head-page">
-        <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light shadow-sm">
+    <header>
+        <nav class="navbar navbar-expand-lg fixed-top navbar-glass">
             <div class="container">
-                <a class="navbar-brand" href="{% url 'portfolio:home' %}">
-                    ReciclArte
+                <a class="navbar-brand brand-logo" href="{% url 'portfolio:home' %}">
+                    <i class="bi bi-palette2 me-2"></i>ReciclArte
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 
                 <div class="collapse navbar-collapse justify-content-center" id="navbarMain">
-                    <ul class="navbar-nav mb-2 mb-lg-0">
+                    <ul class="navbar-nav mb-2 mb-lg-0 gap-3">
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'portfolio:home' %}">Inicio</a>
                         </li>
+                        
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                                 Galerías
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu animate slideIn" aria-labelledby="navbarDropdown">
                                 {% for category in navbar_categories %}
-                                    <li>
-                                        <a class="dropdown-item" href="{% url 'portfolio:category_detail' category.slug %}">
-                                            {{ category.name }}
-                                        </a>
-                                    </li>
+                                    
+                                    {% if category.subcategories.all %}
+                                        <li class="dropend">
+                                            <div class="d-flex flex-wrap align-items-center justify-content-between dropdown">
+                                                <!-- w-auto force button to right -->
+                                                <a class="dropdown-item flex-grow-1 text-truncate w-auto" href="{% url 'portfolio:category_detail' category.slug %}">
+                                                    {{ category.name }}
+                                                </a>
+                                                <a class="dropdown-item w-auto px-3 dropdown-toggle dropdown-toggle-split custom-toggle-split" 
+                                                   role="button" 
+                                                   data-bs-toggle="dropdown" 
+                                                   aria-expanded="false"
+                                                   onclick="event.stopPropagation();">
+                                                   <span class="visually-hidden">Ver subcategorías</span>
+                                                </a>
+
+                                                <ul class="dropdown-menu shadow-sm w-100">
+                                                    <li>
+                                                        <a class="dropdown-item fw-bold text-muted small" href="{% url 'portfolio:category_detail' category.slug %}">
+                                                            Ver todo en {{ category.name }}
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    
+                                                    {% for sub in category.subcategories.all %}
+                                                    <li>
+                                                        <a class="dropdown-item" href="{% url 'portfolio:category_detail' sub.slug %}">
+                                                            {{ sub.name }}
+                                                        </a>
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    {% else %}
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'portfolio:category_detail' category.slug %}">
+                                                {{ category.name }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    
                                 {% empty %}
-                                    <li><span class="dropdown-item text-muted">Sin categorías</span></li>
+                                    <li><span class="dropdown-item text-muted">Pronto disponible...</span></li>
                                 {% endfor %}
                             </ul>
                         </li>
+                        
                         {% if site_profile.contact_email %}
                         <li class="nav-item">
-                            <a class="nav-link" href="mailto:{{ site_profile.contact_email }}">Contacto</a>
+                            <a class="btn btn-sm btn-outline-dark rounded-pill px-4 mt-1 mt-lg-0" href="mailto:{{ site_profile.contact_email }}">
+                                Contacto
+                            </a>
                         </li>
                         {% endif %}
                     </ul>
@@ -62,12 +109,12 @@
         </nav>
     </header>
 
-    <main class="flex-grow-1 mt-5 pt-5">
+    <main class="flex-grow-1" style="margin-top: 80px;">
         {% if messages %}
-            <div class="container mt-3">
+            <div class="container mt-4">
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
+                        <strong>Atención:</strong> {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
@@ -78,28 +125,25 @@
         {% endblock %}
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-dark text-white py-4 mt-auto">
+    <footer class="footer-modern py-5 mt-auto">
         <div class="container text-center">
-            <div class="mb-3">
-                <!-- Redes Sociales Dinámicas -->
+            <div class="mb-3 text-artistic fs-4 text-white">ReciclArte</div>
+            <div class="mb-4">
                 {% for link in social_links %}
-                    <a href="{{ link.url }}" class="text-white mx-2 text-decoration-none" target="_blank" title="{{ link.name }}">
+                    <a href="{{ link.url }}" class="social-icon mx-3" target="_blank" title="{{ link.name }}">
                         {% if link.icon_class %}
                             <i class="{{ link.icon_class }}"></i>
                         {% else %}
-                            {{ link.name }}
+                            <i class="bi bi-link-45deg"></i>
                         {% endif %}
                     </a>
                 {% endfor %}
             </div>
-            <p class="mb-0 small">
-                &copy; {% now "Y" %} {{ site_profile.name|default:"ReciclArte" }}. Todos los derechos reservados.
+            <p class="mb-0 small opacity-75">
+                &copy; {% now "Y" %} {{ site_profile.name|default:"ReciclArte" }}. <br>
             </p>
         </div>
     </footer>
-
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'myjs/main.js' %}"></script>
 </body>
