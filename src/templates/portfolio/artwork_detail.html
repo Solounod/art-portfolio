@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}{{ artwork.title }} | ReciclArte{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'portfolio:home' %}">Inicio</a></li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'portfolio:category_detail' artwork.category.slug %}">{{ artwork.category.name }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ artwork.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="mb-4 text-center bg-light p-3 rounded">
+                <img src="{{ artwork.cover_image.url }}" class="img-fluid rounded shadow-sm" alt="{{ artwork.title }}" style="max-height: 600px;">
+            </div>
+            {% if artwork.images.exists %}
+            <h4 class="mb-3">Vistas y Detalles</h4>
+            <div class="row row-cols-2 row-cols-md-4 g-3">
+                {% for img_obj in artwork.images.all %}
+                <div class="col">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#modalGallery{{ img_obj.id }}">
+                        <img src="{{ img_obj.image.url }}" class="img-fluid rounded border hover-shadow" alt="Detalle">
+                    </a>
+                </div>
+
+                <div class="modal fade" id="modalGallery{{ img_obj.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-body p-0">
+                                <img src="{{ img_obj.image.url }}" class="w-100" alt="Zoom">
+                                {% if img_obj.caption %}
+                                    <div class="p-2 text-center text-muted small">{{ img_obj.caption }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
+                <div class="card-body">
+                    <h1 class="h3 card-title">{{ artwork.title }}</h1>
+                    <hr>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><strong>Año:</strong> {{ artwork.year }}</li>
+                        <li class="mb-2"><strong>Técnica:</strong> {{ artwork.technique }}</li>
+                        {% if artwork.dimensions %}
+                        <li class="mb-2"><strong>Dimensiones:</strong> {{ artwork.dimensions }}</li>
+                        {% endif %}
+                    </ul>
+                    
+                    <div class="mt-4">
+                        <h5>Sobre la obra</h5>
+                        <p class="card-text text-muted">
+                            {{ artwork.description|linebreaks }}
+                        </p>
+                    </div>
+                    {% if site_profile.contact_email %}
+                    <div class="d-grid mt-4">
+                        <a href="mailto:{{ site_profile.contact_email }}?subject=Consulta sobre: {{ artwork.title }}" class="btn btn-dark">
+                            Consultar disponibilidad
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

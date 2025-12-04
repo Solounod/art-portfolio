@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+{% if latest_artworks %}
+<div id="carouselHome" class="carousel slide carousel-fade" data-bs-ride="carousel">
+    <div class="carousel-inner" style="max-height: 600px;"> 
+        {% for artwork in latest_artworks %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            {% if artwork.cover_image %}
+                <img src="{{ artwork.cover_image.url }}" class="d-block w-100 object-fit-cover" style="height: 600px;" alt="{{ artwork.title }}">
+            {% endif %}
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+                <h5>{{ artwork.title }}</h5>
+                <p>{{ artwork.technique }}</p>
+                <a href="{% url 'portfolio:artwork_detail' artwork.slug %}" class="btn btn-sm btn-outline-light">Ver Obra</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselHome" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselHome" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+{% endif %}
+
+<!-- Sección de Categorías -->
+<section class="container my-5">
+    <div class="text-center mb-5">
+        <h2>Galerías</h2>
+        <p class="text-muted">Un viaje por el camino artístico y sus técnicas</p>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for category in categories %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                {% if category.cover_image %}
+                    <img src="{{ category.cover_image.url }}" class="card-img-top" alt="{{ category.name }}" style="height: 250px; object-fit: cover;">
+                {% else %}
+                    <!-- Placeholder si no hay imagen -->
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 250px;">
+                        <span>Sin Portada</span>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ category.name }}</h5>
+                    <p class="card-text small text-muted">{{ category.description|truncatechars:80 }}</p>
+                    <a href="{% url 'portfolio:category_detail' category.slug %}" class="btn btn-outline-primary">Explorar</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% if site_profile %}
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+                {% if site_profile.photo %}
+                    <img src="{{ site_profile.photo.url }}" class="img-fluid rounded-circle shadow" style="width: 200px; height: 200px; object-fit: cover;">
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                <h2>Sobre {{ site_profile.name }}</h2>
+                <div class="lead">
+                    {{ site_profile.bio|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
