@@ -1,12 +1,9 @@
 # src/apps/portfolio/models.py
 from django.db import models
 from django.utils.text import slugify
-from apps.core.models import TimeStampedModel 
+from core.models import TimeStampedModel 
 
 class Category(TimeStampedModel):
-    """
-    Categoría recursiva. Permite niveles infinitos (Ej: Escultura -> Piedra).
-    """
     parent = models.ForeignKey(
         'self', 
         null=True, 
@@ -40,10 +37,6 @@ class Category(TimeStampedModel):
 
 
 class Artwork(TimeStampedModel):
-    """
-    La ficha técnica de la obra.
-    NO contiene la galería completa, solo la información principal.
-    """
     category = models.ForeignKey(
         Category, 
         on_delete=models.PROTECT,
@@ -78,10 +71,6 @@ class Artwork(TimeStampedModel):
 
 
 class ArtworkImage(models.Model):
-    """
-    Galería de imágenes asociada a una obra específica.
-    Ideal para esculturas (diferentes ángulos) o detalles.
-    """
     artwork = models.ForeignKey(
         Artwork, 
         on_delete=models.CASCADE, 
