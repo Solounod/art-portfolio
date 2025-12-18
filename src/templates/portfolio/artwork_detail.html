@@ -4,70 +4,85 @@
 
 {% block content %}
 <div class="container my-5">
+    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'portfolio:home' %}">Inicio</a></li>
+            <li class="breadcrumb-item "><a class="text-decoration-none link-offset-0 link-opacity-50-hover link-danger" href="{% url 'portfolio:home' %}">Inicio</a></li>
             <li class="breadcrumb-item">
-                <a href="{% url 'portfolio:category_detail' artwork.category.slug %}">{{ artwork.category.name }}</a>
+                <a class="text-decoration-none link-offset-0 link-opacity-50-hover link-danger" href="{% url 'portfolio:category_detail' artwork.category.slug %}">{{ artwork.category.name }}</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">{{ artwork.title }}</li>
         </ol>
     </nav>
 
     <div class="row">
+        <!-- COLUMNA IZQUIERDA: Galería -->
         <div class="col-lg-8">
-            <div class="mb-4 text-center bg-light p-3 rounded">
-                <img src="{{ artwork.cover_image.url }}" class="img-fluid rounded shadow-sm" alt="{{ artwork.title }}" style="max-height: 600px;">
-            </div>
-            {% if artwork.images.exists %}
-            <h4 class="mb-3">Vistas y Detalles</h4>
-            <div class="row row-cols-2 row-cols-md-4 g-3">
-                {% for img_obj in artwork.images.all %}
-                <div class="col">
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#modalGallery{{ img_obj.id }}">
-                        <img src="{{ img_obj.image.url }}" class="img-fluid rounded border hover-shadow" alt="Detalle">
-                    </a>
+            <!-- Imagen Principal (Cover) -->
+            <div class="mb-4 text-center bg-light p-1 rounded shadow-sm overflow-hidden position-relative photo-container js-zoom-trigger" 
+                 data-img-url="{{ artwork.cover_image.url }}" 
+                 style="cursor: pointer;">
+                
+                <img src="{{ artwork.cover_image.url }}" 
+                     class="img-fluid rounded" 
+                     alt="{{ artwork.title }}" 
+                     style="max-height: 400px; width: 100%; object-fit: contain;">
+                
+                <!-- Icono Lupa -->
+                <div class="hover-overlay">
+                    <i class="bi bi-zoom-in text-white fs-1"></i>
                 </div>
+            </div>
 
-                <div class="modal fade" id="modalGallery{{ img_obj.id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-body p-0">
-                                <img src="{{ img_obj.image.url }}" class="w-100" alt="Zoom">
-                                {% if img_obj.caption %}
-                                    <div class="p-2 text-center text-muted small">{{ img_obj.caption }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
+            <!-- Detalles -->
+            {% if artwork.images.exists %}
+            <h5 class="mb-3 text-muted border-bottom pb-2">Vistas y Detalles</h5>
+            
+            <div class="gallery-grid">
+                {% for img_obj in artwork.images.all %}
+                <div class="gallery-item js-zoom-trigger" data-img-url="{{ img_obj.image.url }}">
+                    <img src="{{ img_obj.image.url }}" class="gallery-img" alt="Detalle">
+                    <div class="hover-overlay">
+                        <i class="bi bi-zoom-in text-white fs-3"></i>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% endif %}
         </div>
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
-                <div class="card-body">
-                    <h1 class="h3 card-title">{{ artwork.title }}</h1>
-                    <hr>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><strong>Año:</strong> {{ artwork.year }}</li>
-                        <li class="mb-2"><strong>Técnica:</strong> {{ artwork.technique }}</li>
+
+        <!-- COLUMNA DERECHA -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 100px; z-index: 10;">
+                <div class="card-body p-4">
+                    <h1 class="h3 card-title fw-bold text-danger opacity-75">{{ artwork.title }}</h1>
+                    <div class="h-1 w-25 bg-secondary mb-4 rounded"></div>
+                    
+                    <ul class="list-unstyled mb-4 text-muted">
+                        <li class="mb-2 d-flex justify-content-between border-bottom pb-2">
+                            <strong>Año:</strong> <span>{{ artwork.year }}</span>
+                        </li>
+                        <li class="mb-2 d-flex justify-content-between border-bottom pb-2">
+                            <strong>Técnica:</strong> <span class="text-end">{{ artwork.technique }}</span>
+                        </li>
                         {% if artwork.dimensions %}
-                        <li class="mb-2"><strong>Dimensiones:</strong> {{ artwork.dimensions }}</li>
+                        <li class="mb-2 d-flex justify-content-between border-bottom pb-2">
+                            <strong>Dimensiones:</strong> <span>{{ artwork.dimensions }}</span>
+                        </li>
                         {% endif %}
                     </ul>
                     
-                    <div class="mt-4">
-                        <h5>Sobre la obra</h5>
-                        <p class="card-text text-muted">
-                            {{ artwork.description|linebreaks }}
+                    <div class="mb-4">
+                        <h5 class="fw-bold h6">Sobre la obra</h5>
+                        <p class="card-text text-muted small" style="line-height: 1.6;">
+                            {{ artwork.description|linebreaksbr }}
                         </p>
                     </div>
+
                     {% if site_profile.contact_email %}
-                    <div class="d-grid mt-4">
-                        <a href="mailto:{{ site_profile.contact_email }}?subject=Consulta sobre: {{ artwork.title }}" class="btn btn-dark">
-                            Consultar disponibilidad
+                    <div class="d-grid gap-2">
+                        <a href="mailto:{{ site_profile.contact_email }}?subject=Consulta sobre: {{ artwork.title }}" class="btn btn-dark rounded-pill py-2">
+                            <i class="bi bi-envelope me-2"></i>Consultar disponibilidad
                         </a>
                     </div>
                     {% endif %}
@@ -76,4 +91,10 @@
         </div>
     </div>
 </div>
+<!-- LIGHTBOX -->
+<div class="lightbox-overlay" id="zoomImgBox">
+    <button class="close-lightbox" id="closeBtn">&times;</button>
+    <img src="" id="zoomImgDisplay" alt="Zoom Preview">
+</div>
+
 {% endblock %}
