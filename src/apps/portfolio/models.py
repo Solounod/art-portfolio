@@ -1,7 +1,7 @@
-# src/apps/portfolio/models.py
 from django.db import models
 from django.utils.text import slugify
-from core.models import TimeStampedModel 
+from core.models import TimeStampedModel
+from core.utils import optimize_image 
 
 class Category(TimeStampedModel):
     parent = models.ForeignKey(
@@ -25,6 +25,11 @@ class Category(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+        if self.cover_image:
+            optimized_file = optimize_image(self.cover_image, max_width=1200)
+            if optimized_file: 
+                self.cover_image = optimized_file
+                
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -64,6 +69,11 @@ class Artwork(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
+        if self.cover_image:
+            optimized_file = optimize_image(self.cover_image, max_width=1200)
+            if optimized_file:
+                self.cover_image = optimized_file
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -86,6 +96,14 @@ class ArtworkImage(models.Model):
         verbose_name = 'Imagen de Galería'
         verbose_name_plural = 'Imágenes de Galería'
         ordering = ['order']
+
+    def save(self, *args, **kwargs):
+        if self.image:
+            optimized_file = optimize_image(self.image, max_width=1600)
+            if optimized_file:
+                self.image = optimized_file
+                
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Img: {self.artwork.title} - {self.caption or 'Sin título'}"
