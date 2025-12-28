@@ -42,7 +42,7 @@
             transition: color 0.3s;
         }
 
-        .nav-link::after {
+        .nav-link::before {
             content: '';
             position: absolute;
             width: 0;
@@ -51,10 +51,11 @@
             left: 0;
             background-color: var(--color-accent);
             transition: width 0.3s ease-in-out;
+            z-index: 1; 
         }
 
+        .nav-link:hover::before { width: 100%; }
         .nav-link:hover { color: var(--color-accent) !important; }
-        .nav-link:hover::after { width: 100%; }
         
         .dropdown-menu {
             border: none;
